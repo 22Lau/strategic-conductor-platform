@@ -16,6 +16,7 @@ import NewStrategicArea from "./pages/strategic-areas/NewStrategicArea";
 import StrategyContributions from "./pages/strategy/StrategyContributions";
 import StrategyObjectives from "./pages/strategy/StrategyObjectives";
 import StrategyInitiatives from "./pages/strategy/StrategyInitiatives";
+import StrategyPerspectives from "./pages/strategy/StrategyPerspectives";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import MainLayout from "./components/MainLayout";
@@ -46,8 +47,12 @@ const App = () => (
                 <Route path="/strategy/contributions" element={<StrategyContributions />} />
                 <Route path="/strategy/objectives" element={<StrategyObjectives />} />
                 <Route path="/strategy/initiatives" element={<StrategyInitiatives />} />
+                <Route path="/strategy/perspectives" element={<StrategyPerspectives />} />
               </Route>
             </Route>
+            
+            {/* Welcome page */}
+            <Route path="/welcome" element={<Index />} />
             
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />

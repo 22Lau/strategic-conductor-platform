@@ -36,6 +36,13 @@ const StrategyWorkflow = () => {
       description: "Create actionable initiatives for each objective",
       status: "not-started",
       path: "/strategy/initiatives"
+    },
+    {
+      id: "step4",
+      title: "Expert Perspectives",
+      description: "Get insights from different departments on your strategy",
+      status: "not-started",
+      path: "/strategy/perspectives"
     }
   ]);
 
@@ -64,7 +71,7 @@ const StrategyWorkflow = () => {
         <p className="text-gray-600">Follow these steps to develop your strategic deployment plan</p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {steps.map((step, index) => (
           <Card 
             key={step.id}
