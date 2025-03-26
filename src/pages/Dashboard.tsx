@@ -7,6 +7,7 @@ import { ChevronRight, TrendingUp, Users, Target, Calendar, CheckCircle } from "
 import { useAuth } from "@/contexts/AuthContext";
 import DashboardMetrics from "@/components/dashboard/DashboardMetrics";
 import DashboardChart from "@/components/dashboard/DashboardChart";
+import StrategyWorkflow from "@/components/strategy/StrategyWorkflow";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
@@ -85,6 +86,11 @@ const Dashboard = () => {
             strategicAreasCount={areas.length} 
           />
           
+          {/* Strategic Deployment Process */}
+          <div className="mb-8">
+            <StrategyWorkflow />
+          </div>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <Card>
               <CardHeader>
@@ -100,7 +106,7 @@ const Dashboard = () => {
                 <DashboardChart />
               </CardContent>
               <CardFooter>
-                <Button variant="outline" onClick={() => navigate("/strategy/progress")}>
+                <Button variant="outline" onClick={() => navigate("/strategy/contributions")}>
                   View Details <ChevronRight className="ml-2 h-4 w-4" />
                 </Button>
               </CardFooter>
@@ -133,7 +139,7 @@ const Dashboard = () => {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button variant="outline" onClick={() => navigate("/deadlines")}>
+                <Button variant="outline" onClick={() => navigate("/strategy/objectives")}>
                   View All <ChevronRight className="ml-2 h-4 w-4" />
                 </Button>
               </CardFooter>

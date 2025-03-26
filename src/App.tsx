@@ -13,6 +13,9 @@ import OrganizationsList from "./pages/organizations/OrganizationsList";
 import NewOrganization from "./pages/organizations/NewOrganization";
 import StrategicAreasList from "./pages/strategic-areas/StrategicAreasList";
 import NewStrategicArea from "./pages/strategic-areas/NewStrategicArea";
+import StrategyContributions from "./pages/strategy/StrategyContributions";
+import StrategyObjectives from "./pages/strategy/StrategyObjectives";
+import StrategyInitiatives from "./pages/strategy/StrategyInitiatives";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import MainLayout from "./components/MainLayout";
@@ -38,6 +41,11 @@ const App = () => (
                 <Route path="/organizations/new" element={<NewOrganization />} />
                 <Route path="/strategic-areas" element={<StrategicAreasList />} />
                 <Route path="/strategic-areas/new" element={<NewStrategicArea />} />
+                
+                {/* Strategy workflow routes */}
+                <Route path="/strategy/contributions" element={<StrategyContributions />} />
+                <Route path="/strategy/objectives" element={<StrategyObjectives />} />
+                <Route path="/strategy/initiatives" element={<StrategyInitiatives />} />
               </Route>
             </Route>
             
