@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,15 +10,13 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import DashboardLoading from "@/components/dashboard/DashboardLoading";
 
-// Placeholder component for a real AI-powered suggestion system
 const AiSuggestionSystem = ({ contributions, onSuggestionSelect }: { 
   contributions: any[]; 
   onSuggestionSelect: (suggestion: { objective: string, kpis: string[] }) => void;
 }) => {
-  // This would be replaced with actual TensorFlow.js integration
   const generateSuggestion = () => {
-    // Mock AI suggestions based on contributions
     const mockSuggestions = [
       {
         objective: "Improve customer satisfaction through enhanced self-service capabilities",
@@ -39,7 +36,6 @@ const AiSuggestionSystem = ({ contributions, onSuggestionSelect }: {
       }
     ];
     
-    // Return a random suggestion
     return mockSuggestions[Math.floor(Math.random() * mockSuggestions.length)];
   };
   
@@ -79,39 +75,39 @@ const StrategyObjectives = () => {
   const [newObjective, setNewObjective] = useState({ title: "", description: "" });
   const [kpis, setKpis] = useState<string[]>([]);
   const [newKpi, setNewKpi] = useState("");
+  const [mounted, setMounted] = useState(true);
   
   useEffect(() => {
+    setMounted(true);
+    
     const fetchContributions = async () => {
-      if (!user) return;
+      if (!user || !mounted) return;
       
       try {
-        // First get the user's organizations
         const { data: orgData } = await supabase
           .from('user_organizations')
           .select('organization_id')
           .eq('user_id', user.id);
         
         if (!orgData?.length) {
-          setLoading(false);
+          if (mounted) setLoading(false);
           return;
         }
         
         const orgIds = orgData.map(org => org.organization_id);
         
-        // Then get areas for those organizations
         const { data: areaData } = await supabase
           .from('strategic_areas')
           .select('id')
           .in('organization_id', orgIds);
         
         if (!areaData?.length) {
-          setLoading(false);
+          if (mounted) setLoading(false);
           return;
         }
         
         const areaIds = areaData.map(area => area.id);
         
-        // Finally get contributions for those areas
         const { data, error } = await supabase
           .from('strategic_contributions')
           .select('*')
@@ -119,21 +115,29 @@ const StrategyObjectives = () => {
         
         if (error) throw error;
         
-        setContributions(data || []);
-        setLoading(false);
+        if (mounted) {
+          setContributions(data || []);
+          setLoading(false);
+        }
       } catch (error) {
         console.error('Error fetching contributions:', error);
-        toast({
-          title: "Failed to load contributions",
-          description: "Please try again later",
-          variant: "destructive",
-        });
-        setLoading(false);
+        if (mounted) {
+          toast({
+            title: "Failed to load contributions",
+            description: "Please try again later",
+            variant: "destructive",
+          });
+          setLoading(false);
+        }
       }
     };
     
     fetchContributions();
-  }, [user]);
+    
+    return () => {
+      setMounted(false);
+    };
+  }, [user, toast]);
   
   const handleAddKpi = () => {
     if (newKpi.trim()) {
@@ -151,14 +155,13 @@ const StrategyObjectives = () => {
       const objective = {
         ...newObjective,
         kpis: [...kpis],
-        id: Date.now().toString() // This would be a real ID from the database
+        id: Date.now().toString()
       };
       
       setObjectives([...objectives, objective]);
       setNewObjective({ title: "", description: "" });
       setKpis([]);
       
-      // Here you would save to the database
       toast({
         title: "Objective added",
         description: "Your objective and KPIs have been saved",
@@ -321,11 +324,7 @@ const StrategyObjectives = () => {
             </CardHeader>
             <CardContent>
               {loading ? (
-                <div className="animate-pulse space-y-2">
-                  <div className="h-4 bg-gray-200 rounded"></div>
-                  <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-                  <div className="h-4 bg-gray-200 rounded"></div>
-                </div>
+                <DashboardLoading />
               ) : contributions.length > 0 ? (
                 <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
                   {contributions.map((contribution) => (
