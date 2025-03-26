@@ -9,7 +9,7 @@ const StrategicProgressCard = () => {
   const navigate = useNavigate();
   
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <CardTitle className="flex items-center">
           <TrendingUp className="mr-2 h-5 w-5" />
@@ -19,7 +19,7 @@ const StrategicProgressCard = () => {
           Progress on your strategic initiatives
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-0">
         <DashboardChart />
       </CardContent>
       <CardFooter>

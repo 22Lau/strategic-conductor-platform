@@ -11,59 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import DashboardLoading from "@/components/dashboard/DashboardLoading";
-
-const AiSuggestionSystem = ({ contributions, onSuggestionSelect }: { 
-  contributions: any[]; 
-  onSuggestionSelect: (suggestion: { objective: string, kpis: string[] }) => void;
-}) => {
-  const generateSuggestion = () => {
-    const mockSuggestions = [
-      {
-        objective: "Improve customer satisfaction through enhanced self-service capabilities",
-        kpis: [
-          "Reduce support ticket volume by 25%",
-          "Increase knowledge base utilization by 40%",
-          "Achieve self-service resolution rate of 65%"
-        ]
-      },
-      {
-        objective: "Optimize operational efficiency in customer support processes",
-        kpis: [
-          "Decrease average response time by 30%",
-          "Increase first-contact resolution rate to 80%",
-          "Reduce escalation rate by 15%"
-        ]
-      }
-    ];
-    
-    return mockSuggestions[Math.floor(Math.random() * mockSuggestions.length)];
-  };
-  
-  return (
-    <Card className="bg-blue-50 border-blue-200">
-      <CardHeader>
-        <CardTitle className="flex items-center">
-          <BrainCircuit className="mr-2 h-5 w-5 text-blue-600" />
-          AI Suggestions
-        </CardTitle>
-        <CardDescription>
-          Based on your contributions, our AI suggests these objectives and KPIs
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Button
-          onClick={() => onSuggestionSelect(generateSuggestion())}
-          className="w-full bg-blue-600 hover:bg-blue-700"
-        >
-          Generate AI Suggestions
-        </Button>
-        <p className="mt-4 text-xs text-blue-600">
-          Using TensorFlow.js to analyze patterns and suggest optimal objectives
-        </p>
-      </CardContent>
-    </Card>
-  );
-};
+import AiSuggestionSystem from "@/components/strategy/AiSuggestionSystem";
 
 const StrategyObjectives = () => {
   const { user } = useAuth();
