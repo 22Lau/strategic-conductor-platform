@@ -129,6 +129,14 @@ const StrategyInitiatives = () => {
     });
   };
   
+  // Fixed the issue by properly handling the tab switching
+  const switchToCreateTab = () => {
+    const tabTrigger = document.querySelector('[data-value="create"]') as HTMLElement;
+    if (tabTrigger) {
+      tabTrigger.click();
+    }
+  };
+  
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
@@ -407,7 +415,7 @@ const StrategyInitiatives = () => {
                         variant="outline" 
                         size="sm" 
                         className="mt-2"
-                        onClick={() => document.querySelector('[data-value="create"]')?.click()}
+                        onClick={switchToCreateTab}
                       >
                         <PlusCircle className="mr-2 h-4 w-4" /> Create Your First Initiative
                       </Button>
