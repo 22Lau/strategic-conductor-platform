@@ -1,6 +1,6 @@
 
 import { format } from "date-fns";
-import { Check } from "lucide-react";
+import { Check, PlusCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
