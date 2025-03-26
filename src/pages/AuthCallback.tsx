@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -9,21 +10,33 @@ const AuthCallback = () => {
   useEffect(() => {
     // Handle the OAuth callback
     const handleAuthCallback = async () => {
-      const { hash, href, origin } = window.location;
-      
-      if (hash) {
-        try {
-          // Parse the hash string to extract the access token
-          await supabase.auth.getSession();
-          
-          // Navigate to home page
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("Error in auth callback:", error);
+          toast({
+            title: "Authentication failed",
+            description: error.message,
+            variant: "destructive",
+          });
+          navigate("/auth");
+          return;
+        }
+        
+        if (data?.session) {
+          // Successfully authenticated
+          toast({
+            title: "Authentication successful",
+            description: "You have been signed in",
+          });
           navigate("/");
-        } catch (error) {
-          console.error("Error handling auth callback:", error);
+        } else {
+          console.error("No session found");
           navigate("/auth");
         }
-      } else {
-        // If no hash is present, redirect to login
+      } catch (error) {
+        console.error("Error handling auth callback:", error);
         navigate("/auth");
       }
     };
