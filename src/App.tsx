@@ -8,8 +8,14 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
+import Dashboard from "./pages/Dashboard";
+import OrganizationsList from "./pages/organizations/OrganizationsList";
+import NewOrganization from "./pages/organizations/NewOrganization";
+import StrategicAreasList from "./pages/strategic-areas/StrategicAreasList";
+import NewStrategicArea from "./pages/strategic-areas/NewStrategicArea";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import MainLayout from "./components/MainLayout";
 
 const queryClient = new QueryClient();
 
@@ -26,8 +32,13 @@ const App = () => (
             
             {/* Protected routes */}
             <Route element={<ProtectedRoute />}>
-              <Route path="/" element={<Index />} />
-              {/* Add other protected routes here */}
+              <Route element={<MainLayout />}>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/organizations" element={<OrganizationsList />} />
+                <Route path="/organizations/new" element={<NewOrganization />} />
+                <Route path="/strategic-areas" element={<StrategicAreasList />} />
+                <Route path="/strategic-areas/new" element={<NewStrategicArea />} />
+              </Route>
             </Route>
             
             {/* Catch-all route */}
