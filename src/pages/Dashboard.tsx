@@ -6,8 +6,6 @@ import { toast } from "@/hooks/use-toast";
 import DashboardMetrics from "@/components/dashboard/DashboardMetrics";
 import StrategicProgressCard from "@/components/dashboard/StrategicProgressCard";
 import UpcomingDeadlines from "@/components/dashboard/UpcomingDeadlines";
-import OrganizationsCard from "@/components/dashboard/OrganizationsCard";
-import StrategicAreasCard from "@/components/dashboard/StrategicAreasCard";
 import StrategyWorkflow from "@/components/strategy/StrategyWorkflow";
 import DashboardLoading from "@/components/dashboard/DashboardLoading";
 
@@ -83,11 +81,6 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <StrategicProgressCard />
             <UpcomingDeadlines />
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <OrganizationsCard organizations={organizations} />
-            <StrategicAreasCard areas={areas} />
           </div>
         </>
       )}

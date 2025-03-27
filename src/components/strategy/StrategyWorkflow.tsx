@@ -18,8 +18,8 @@ const StrategyWorkflow = () => {
   const [steps, setSteps] = useState<WorkflowStep[]>([
     {
       id: "step1",
-      title: "Identify Area Contributions",
-      description: "Define how your area contributes to each strategic line",
+      title: "Setup & Contributions",
+      description: "Create organizations, define areas, and identify contributions",
       status: "not-started",
       path: "/strategy/contributions"
     },
