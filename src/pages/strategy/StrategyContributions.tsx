@@ -32,7 +32,9 @@ const StrategyContributions = () => {
   const form = useForm({
     defaultValues: {
       organizationId: "",
+      organization: "", // New field for organization text input
       areaId: "",
+      area: "", // New field for area text input
       strategicLine: "",
       contribution: "",
       examples: ""
@@ -50,6 +52,7 @@ const StrategyContributions = () => {
     defaultValues: {
       name: "",
       organizationId: "",
+      organization: "", // New field for organization text input
       description: "",
       responsibilities: ""
     }
@@ -74,10 +77,6 @@ const StrategyContributions = () => {
         })) || [];
         
         setOrganizations(orgs);
-        if (orgs.length > 0) {
-          form.setValue("organizationId", orgs[0].id);
-          areaForm.setValue("organizationId", orgs[0].id);
-        }
       } catch (error) {
         console.error('Error fetching organizations:', error);
         toast({
@@ -134,10 +133,12 @@ const StrategyContributions = () => {
         .filter((line: string) => line.trim() !== '')
         .map((line: string) => line.trim());
       
+      // Instead of using IDs from selects, we'll save the text values
       const { data, error } = await supabase
         .from('strategic_contributions')
         .insert({
-          area_id: values.areaId,
+          organization_name: values.organization, // Save organization name instead of ID
+          area_name: values.area, // Save area name instead of ID
           strategic_line: values.strategicLine,
           contribution: values.contribution,
           examples: examplesArray
@@ -218,8 +219,10 @@ const StrategyContributions = () => {
         })) || [];
         
         setOrganizations(orgs);
-        form.setValue("organizationId", orgData[0].id);
-        areaForm.setValue("organizationId", orgData[0].id);
+        
+        // Populate the organization field in the form with the new organization name
+        form.setValue("organization", values.name);
+        areaForm.setValue("organization", values.name);
         
         // Reset form
         orgForm.reset();
@@ -249,11 +252,12 @@ const StrategyContributions = () => {
         .filter((line: string) => line.trim() !== '')
         .map((line: string) => line.trim());
       
+      // We'll now use the organization name instead of ID
       const { data, error } = await supabase
         .from('strategic_areas')
         .insert({
           name: values.name,
-          organization_id: values.organizationId,
+          organization_name: values.organization,
           description: values.description,
           responsibilities: responsibilitiesArray
         })
@@ -266,16 +270,8 @@ const StrategyContributions = () => {
         description: "Your strategic area has been successfully created",
       });
       
-      // Refresh areas
-      const { data: areaData, error: areaError } = await supabase
-        .from('strategic_areas')
-        .select('*')
-        .eq('organization_id', values.organizationId);
-        
-      if (areaError) throw areaError;
-      
-      setAreas(areaData || []);
-      form.setValue("areaId", data[0].id);
+      // Update the form with the new area name
+      form.setValue("area", values.name);
       
       // Reset form
       areaForm.reset({
@@ -363,7 +359,7 @@ const StrategyContributions = () => {
                       />
                       
                       <div className="flex justify-between">
-                        <Button type="button" variant="outline" onClick={() => setActiveTab("areas")} disabled={organizations.length === 0}>
+                        <Button type="button" variant="outline" onClick={() => setActiveTab("areas")}>
                           Skip to Areas
                         </Button>
                         <Button type="submit" disabled={loading}>
@@ -388,9 +384,17 @@ const StrategyContributions = () => {
                       {organizations.map(org => (
                         <div key={org.id} className="flex items-center justify-between p-2 hover:bg-muted rounded-md">
                           <span>{org.name}</span>
-                          <span className="text-xs text-muted-foreground">
-                            {org.role.charAt(0).toUpperCase() + org.role.slice(1)}
-                          </span>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => {
+                              form.setValue("organization", org.name);
+                              areaForm.setValue("organization", org.name);
+                              setActiveTab("areas");
+                            }}
+                          >
+                            <ArrowRight className="h-4 w-4" />
+                          </Button>
                         </div>
                       ))}
                     </div>
@@ -402,8 +406,7 @@ const StrategyContributions = () => {
                   <Button 
                     variant="outline" 
                     className="w-full"
-                    onClick={() => organizations.length > 0 && setActiveTab("areas")}
-                    disabled={organizations.length === 0}
+                    onClick={() => setActiveTab("areas")}
                   >
                     Next: Define Strategic Areas
                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -429,25 +432,19 @@ const StrategyContributions = () => {
                     <form onSubmit={areaForm.handleSubmit(handleCreateArea)} className="space-y-6">
                       <FormField
                         control={areaForm.control}
-                        name="organizationId"
+                        name="organization"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Organization</FormLabel>
-                            <Select 
-                              onValueChange={field.onChange} 
-                              defaultValue={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select an organization" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {organizations.map(org => (
-                                  <SelectItem key={org.id} value={org.id}>{org.name}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                            <FormControl>
+                              <Input 
+                                placeholder="Enter organization name" 
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Enter the name of your organization
+                            </FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -503,7 +500,7 @@ const StrategyContributions = () => {
                       />
                       
                       <div className="flex justify-between">
-                        <Button type="button" variant="outline" onClick={() => setActiveTab("contributions")} disabled={areas.length === 0}>
+                        <Button type="button" variant="outline" onClick={() => setActiveTab("contributions")}>
                           Skip to Contributions
                         </Button>
                         <Button type="submit" disabled={loading}>
@@ -532,7 +529,7 @@ const StrategyContributions = () => {
                             variant="ghost" 
                             size="sm" 
                             onClick={() => {
-                              form.setValue("areaId", area.id);
+                              form.setValue("area", area.name);
                               setActiveTab("contributions");
                             }}
                           >
@@ -549,8 +546,7 @@ const StrategyContributions = () => {
                   <Button 
                     variant="outline" 
                     className="w-full"
-                    onClick={() => areas.length > 0 && setActiveTab("contributions")}
-                    disabled={areas.length === 0}
+                    onClick={() => setActiveTab("contributions")}
                   >
                     Next: Define Contributions
                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -577,25 +573,19 @@ const StrategyContributions = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
                           control={form.control}
-                          name="organizationId"
+                          name="organization"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Organization</FormLabel>
-                              <Select 
-                                onValueChange={field.onChange} 
-                                defaultValue={field.value}
-                              >
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select an organization" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  {organizations.map(org => (
-                                    <SelectItem key={org.id} value={org.id}>{org.name}</SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
+                              <FormControl>
+                                <Input 
+                                  placeholder="Enter organization name" 
+                                  {...field} 
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                Enter the name of your organization
+                              </FormDescription>
                               <FormMessage />
                             </FormItem>
                           )}
@@ -603,38 +593,19 @@ const StrategyContributions = () => {
                         
                         <FormField
                           control={form.control}
-                          name="areaId"
+                          name="area"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Strategic Area</FormLabel>
-                              <Select 
-                                onValueChange={field.onChange} 
-                                defaultValue={field.value}
-                                disabled={!watchedOrgId || areas.length === 0}
-                              >
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select an area" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  {areas.map(area => (
-                                    <SelectItem key={area.id} value={area.id}>{area.name}</SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              {areas.length === 0 && watchedOrgId && (
-                                <div className="mt-2">
-                                  <Button 
-                                    type="button" 
-                                    variant="outline" 
-                                    size="sm" 
-                                    onClick={() => setActiveTab("areas")}
-                                  >
-                                    <PlusCircle className="h-4 w-4 mr-2" /> Create Area
-                                  </Button>
-                                </div>
-                              )}
+                              <FormControl>
+                                <Input 
+                                  placeholder="Enter strategic area name" 
+                                  {...field} 
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                Enter the name of the strategic area
+                              </FormDescription>
                               <FormMessage />
                             </FormItem>
                           )}

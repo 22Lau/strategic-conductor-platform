@@ -19,7 +19,7 @@ const StrategyWorkflow = () => {
     {
       id: "step1",
       title: "Setup & Contributions",
-      description: "Create organizations, define areas, and identify contributions",
+      description: "Define your organization, areas, and identify contributions",
       status: "not-started",
       path: "/strategy/contributions"
     },
