@@ -12,7 +12,7 @@ export const navigationItems: NavigationItem[] = [
   { name: "Dashboard", path: "/", icon: <LayoutDashboard className="h-5 w-5" /> },
   { name: "Organizations", path: "/organizations", icon: <Users className="h-5 w-5" /> },
   { name: "Strategic Areas", path: "/strategic-areas", icon: <Target className="h-5 w-5" /> },
-  { name: "Strategic Plans", path: "/plans", icon: <FileText className="h-5 w-5" /> },
+  { name: "Strategic Plans", path: "/strategy/initiatives", icon: <FileText className="h-5 w-5" /> },
   { name: "Reports", path: "/reports", icon: <BarChart className="h-5 w-5" /> },
 ];
 
