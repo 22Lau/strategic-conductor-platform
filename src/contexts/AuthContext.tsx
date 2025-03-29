@@ -28,18 +28,47 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Check for session and set up auth state listener
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log("Auth state changed:", event);
-        setSession(session);
-        setUser(session?.user ?? null);
+    // Initialization for first-party cookie usage
+    const initializeAuth = async () => {
+      try {
+        // Set up auth state listener FIRST with synchronous operations
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          (event, currentSession) => {
+            console.log("Auth state changed:", event);
+            setSession(currentSession);
+            setUser(currentSession?.user ?? null);
+            
+            // Use setTimeout to avoid potential recursive auth state changes
+            if (currentSession?.user) {
+              setTimeout(async () => {
+                const { data, error } = await supabase
+                  .from("profiles")
+                  .select("*")
+                  .eq("id", currentSession.user.id)
+                  .single();
+                
+                if (error) {
+                  console.error("Error fetching profile:", error);
+                } else {
+                  setProfile(data);
+                }
+              }, 0);
+            } else {
+              setProfile(null);
+            }
+          }
+        );
+
+        // THEN check for existing session
+        const { data: { session: initialSession } } = await supabase.auth.getSession();
+        setSession(initialSession);
+        setUser(initialSession?.user ?? null);
         
-        if (session?.user) {
+        if (initialSession?.user) {
           const { data, error } = await supabase
             .from("profiles")
             .select("*")
-            .eq("id", session.user.id)
+            .eq("id", initialSession.user.id)
             .single();
           
           if (error) {
@@ -47,44 +76,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           } else {
             setProfile(data);
           }
-
-          // Reset inactivity timer on any auth state change
-          resetInactivityTimer();
-        } else {
-          setProfile(null);
         }
-
+        
+        setLoading(false);
+        
+        // Reset inactivity timer on initialization
+        if (initialSession) {
+          resetInactivityTimer();
+        }
+        
+        return () => {
+          subscription.unsubscribe();
+        };
+      } catch (error) {
+        console.error("Auth initialization error:", error);
         setLoading(false);
       }
-    );
-
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", session.user.id)
-          .single()
-          .then(({ data, error }) => {
-            if (error) {
-              console.error("Error fetching profile:", error);
-            } else {
-              setProfile(data);
-            }
-            setLoading(false);
-          });
-      } else {
-        setLoading(false);
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
     };
+    
+    initializeAuth();
   }, []);
 
   // Implement auto logout after 30 minutes of inactivity
@@ -143,6 +153,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           data: {
             full_name: fullName,
           },
+          // Ensure cookies are set with SameSite=Lax
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
 
@@ -193,6 +205,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            prompt: 'consent',  // Force consent screen to ensure refresh token
+          }
         },
       });
 

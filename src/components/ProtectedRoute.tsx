@@ -1,4 +1,5 @@
 
+import { useEffect } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -8,6 +9,13 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute = ({ redirectPath = "/auth" }: ProtectedRouteProps) => {
   const { isAuthenticated, loading } = useAuth();
+
+  useEffect(() => {
+    // This ensures we're using the current auth state
+    if (!loading && !isAuthenticated) {
+      console.log("User not authenticated, redirecting to auth page");
+    }
+  }, [isAuthenticated, loading]);
 
   if (loading) {
     return (

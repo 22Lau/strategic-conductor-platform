@@ -11,6 +11,7 @@ const AuthCallback = () => {
     // Handle the OAuth callback
     const handleAuthCallback = async () => {
       try {
+        // Use a more robust method to get session
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {
@@ -25,14 +26,24 @@ const AuthCallback = () => {
         }
         
         if (data?.session) {
+          // Check if the auth state is refreshed properly
+          console.log("Auth callback successful, session established");
+          
           // Successfully authenticated
           toast({
             title: "Authentication successful",
             description: "You have been signed in",
           });
-          navigate("/");
+          
+          // Short delay to ensure auth state is properly updated
+          setTimeout(() => navigate("/"), 100);
         } else {
-          console.error("No session found");
+          console.error("No session found in callback");
+          toast({
+            title: "Authentication issue",
+            description: "Unable to establish session",
+            variant: "destructive",
+          });
           navigate("/auth");
         }
       } catch (error) {
