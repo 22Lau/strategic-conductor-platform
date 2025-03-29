@@ -79,8 +79,19 @@ const DashboardChart = () => {
               }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
+              <XAxis 
+                dataKey="name"
+                allowDuplicatedCategory={false}
+                scale="auto"
+                padding={{ left: 0, right: 0 }}
+                tick={{ fontSize: 12 }}
+              />
+              <YAxis 
+                width={40}
+                tick={{ fontSize: 12 }}
+                tickCount={5} 
+                domain={[0, 'auto']}
+              />
               <Tooltip 
                 formatter={(value: number) => [`${value} initiatives`, '']}
                 labelFormatter={(label) => `Period: ${label}`}
