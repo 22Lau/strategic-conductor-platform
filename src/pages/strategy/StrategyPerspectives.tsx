@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import AiSuggestionSystem from "@/components/strategy/AiSuggestionSystem";
+import { AiSuggestion } from "@/services/aiService";
 
 // Mock data - this would come from the database in a real implementation
 const mockInitiatives = [
@@ -52,6 +54,22 @@ const StrategyPerspectives = () => {
   const [newStrategy, setNewStrategy] = useState("");
   const [devilsAdvocate, setDevilsAdvocate] = useState<string[]>([]);
   const [newDevilPoint, setNewDevilPoint] = useState("");
+  const [showAiInsights, setShowAiInsights] = useState(false);
+
+  // Format perspectives as "contributions" for the AI service
+  const getContributionsFromPerspectives = () => {
+    return perspectives.map(perspective => {
+      const initiative = mockInitiatives.find(i => i.id === perspective.initiativeId);
+      const expert = experts.find(e => e.id === perspective.expertId);
+      
+      return {
+        id: `${perspective.initiativeId}-${perspective.expertId}`,
+        strategic_line: expert?.name || "Unknown",
+        contribution: initiative?.title || "Unknown Initiative",
+        examples: [perspective.argument]
+      };
+    });
+  };
 
   const handleAddPerspective = () => {
     if (!newPerspective.initiativeId || !newPerspective.expertId || !newPerspective.argument) {
@@ -102,6 +120,15 @@ const StrategyPerspectives = () => {
       title: `Exporting as ${format.toUpperCase()}`,
       description: "Your strategy export is being prepared"
     });
+  };
+
+  const handleSuggestionSelect = (suggestion: AiSuggestion) => {
+    toast({
+      title: "AI Insight Applied",
+      description: `Applied: ${suggestion.objective}`
+    });
+    
+    // Here you might want to save this insight or navigate to another part of the app
   };
 
   const getExpertColor = (expertId: string) => {
@@ -400,22 +427,38 @@ const StrategyPerspectives = () => {
             </CardContent>
           </Card>
           
-          <Card className="bg-blue-50 border-blue-200">
-            <CardHeader>
-              <CardTitle className="text-blue-800">AI Recommendations</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-blue-800 mb-4">
-                Our AI can help you analyze expert perspectives and identify the best path forward
-              </p>
-              <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                Generate AI Insights
-              </Button>
-              <p className="mt-4 text-xs text-blue-600">
-                Using TensorFlow.js to analyze patterns and recommend optimal initiatives
-              </p>
-            </CardContent>
-          </Card>
+          {showAiInsights ? (
+            <AiSuggestionSystem 
+              contributions={getContributionsFromPerspectives()} 
+              onSuggestionSelect={handleSuggestionSelect}
+            />
+          ) : (
+            <Card className="bg-blue-50 border-blue-200">
+              <CardHeader>
+                <CardTitle className="text-blue-800">AI Recommendations</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-blue-800 mb-4">
+                  Our AI can help you analyze expert perspectives and identify the best path forward
+                </p>
+                <Button 
+                  className="w-full bg-blue-600 hover:bg-blue-700" 
+                  onClick={() => setShowAiInsights(true)}
+                  disabled={perspectives.length === 0}
+                >
+                  Generate AI Insights
+                </Button>
+                {perspectives.length === 0 && (
+                  <p className="mt-2 text-xs text-blue-600">
+                    Add expert perspectives first to enable AI insights
+                  </p>
+                )}
+                <p className="mt-4 text-xs text-blue-600">
+                  Using TensorFlow.js to analyze patterns and recommend optimal initiatives
+                </p>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>
