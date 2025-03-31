@@ -85,25 +85,30 @@ const StrategyContributions = () => {
       try {
         setLoading(true);
         // Fetch areas by organization name
-        const { data: rawData, error } = await supabase
+        const { data, error } = await supabase
           .from('strategic_areas')
           .select('*')
           .eq('organization_name', selectedOrganization);
           
         if (error) throw error;
         
-        // Simplified approach: first cast to any array, then map to StrategicArea type
-        const data = rawData as Array<Record<string, any>> || [];
+        // Use type assertion to avoid deep type inference
+        const areasData: StrategicArea[] = [];
         
-        const areasData: StrategicArea[] = data.map(area => ({
-          id: area.id,
-          name: area.name,
-          organization_id: area.organization_id,
-          organization_name: area.organization_name,
-          responsibilities: area.responsibilities,
-          created_at: area.created_at,
-          updated_at: area.updated_at
-        }));
+        // Manually map each item to avoid complex type inference
+        if (data) {
+          for (const item of data) {
+            areasData.push({
+              id: item.id,
+              name: item.name,
+              organization_id: item.organization_id,
+              organization_name: item.organization_name,
+              responsibilities: item.responsibilities,
+              created_at: item.created_at,
+              updated_at: item.updated_at
+            });
+          }
+        }
         
         setAreas(areasData);
       } catch (error) {
