@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -104,19 +105,19 @@ const StrategyContributions = () => {
           return;
         }
         
-        const areasData: StrategicArea[] = [];
+        // Convert to array and cast to StrategicAreaRow
+        const areaRows = data as StrategicAreaRow[];
         
-        (data as StrategicAreaRow[]).forEach(item => {
-          areasData.push({
-            id: item.id,
-            name: item.name,
-            organization_id: item.organization_id,
-            organization_name: selectedOrganization,
-            responsibilities: item.responsibilities || [],
-            created_at: item.created_at,
-            updated_at: item.updated_at
-          });
-        });
+        // Map to StrategicArea objects
+        const areasData: StrategicArea[] = areaRows.map(item => ({
+          id: item.id,
+          name: item.name,
+          organization_id: item.organization_id,
+          organization_name: selectedOrganization,
+          responsibilities: item.responsibilities || [],
+          created_at: item.created_at,
+          updated_at: item.updated_at
+        }));
         
         setAreas(areasData);
       } catch (error) {
