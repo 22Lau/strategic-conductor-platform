@@ -90,29 +90,25 @@ export const useStrategyData = (userId?: string) => {
       
       try {
         setLoading(true);
+        // Using organization name directly to fetch strategic areas
+        // Fix: Change the query to use a join or use organization_id instead
         const { data, error } = await supabase
           .from('strategic_areas')
           .select('*')
-          .eq('organization_name', selectedOrganization);
+          .eq('organization_id', selectedOrganization);
           
         if (error) throw error;
         
-        // Safer handling of data
-        const areasData: StrategicArea[] = [];
-        
-        if (data) {
-          data.forEach(item => {
-            areasData.push({
-              id: item.id,
-              name: item.name,
-              organization_id: item.organization_id,
-              organization_name: selectedOrganization,
-              responsibilities: item.responsibilities || [],
-              created_at: item.created_at,
-              updated_at: item.updated_at
-            });
-          });
-        }
+        // Explicitly map data to our StrategicArea type to avoid deep type instantiation
+        const areasData: StrategicArea[] = data ? data.map((item: StrategicAreaRow) => ({
+          id: item.id,
+          name: item.name,
+          organization_id: item.organization_id,
+          organization_name: selectedOrganization,
+          responsibilities: item.responsibilities || [],
+          created_at: item.created_at,
+          updated_at: item.updated_at
+        })) : [];
         
         setAreas(areasData);
       } catch (error) {
@@ -130,8 +126,8 @@ export const useStrategyData = (userId?: string) => {
     fetchAreas();
   }, [selectedOrganization, toast]);
   
-  const handleOrganizationSelected = (orgName: string) => {
-    setSelectedOrganization(orgName);
+  const handleOrganizationSelected = (orgId: string) => {
+    setSelectedOrganization(orgId);
   };
   
   const handleAreaSelected = (areaName: string) => {
