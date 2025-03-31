@@ -28,10 +28,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Check for session and set up auth state listener
   useEffect(() => {
-    // Initialization for first-party cookie usage
     const initializeAuth = async () => {
       try {
-        // Set up auth state listener FIRST with synchronous operations
+        // Set up auth state listener FIRST
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           (event, currentSession) => {
             console.log("Auth state changed:", event);

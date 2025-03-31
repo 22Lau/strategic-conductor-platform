@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,15 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Clear form fields on tab switch
+  const handleTabChange = (value: string) => {
+    setEmail("");
+    setPassword("");
+    if (value === "signup") {
+      setFullName("");
+    }
+  };
 
   // Redirect if user is already authenticated
   if (isAuthenticated && !loading) {
@@ -92,7 +101,7 @@ const Auth = () => {
           <CardTitle className="text-2xl font-bold">Strategic Deployment Platform</CardTitle>
           <CardDescription>Sign in to your account or create a new one</CardDescription>
         </CardHeader>
-        <Tabs defaultValue="signin" className="w-full">
+        <Tabs defaultValue="signin" className="w-full" onValueChange={handleTabChange}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="signin">Sign In</TabsTrigger>
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
