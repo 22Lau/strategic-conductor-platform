@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -62,7 +61,6 @@ const StrategyContributions = () => {
           
         if (error) throw error;
         
-        // Explicitly type and transform the response data
         const orgs: Organization[] = (data as UserOrganizationResponse[] || []).map(item => ({
           id: item.organizations.id,
           name: item.organizations.name,
@@ -94,7 +92,6 @@ const StrategyContributions = () => {
       
       try {
         setLoading(true);
-        // Fetch areas by organization name
         const { data, error } = await supabase
           .from('strategic_areas')
           .select('*')
@@ -102,28 +99,24 @@ const StrategyContributions = () => {
           
         if (error) throw error;
         
-        // Transform the raw data into our StrategicArea type, avoiding complex type inference
+        if (!data) {
+          setAreas([]);
+          return;
+        }
+        
         const areasData: StrategicArea[] = [];
         
-        if (data) {
-          // Cast data as any to bypass TypeScript's complex type inference
-          const rawData = data as any[];
-          
-          rawData.forEach(item => {
-            // Create a new StrategicArea object with explicit properties
-            const area: StrategicArea = {
-              id: item.id,
-              name: item.name,
-              organization_id: item.organization_id,
-              // Add organization_name from selected organization
-              organization_name: selectedOrganization,
-              responsibilities: Array.isArray(item.responsibilities) ? item.responsibilities : [],
-              created_at: item.created_at,
-              updated_at: item.updated_at
-            };
-            areasData.push(area);
+        (data as StrategicAreaRow[]).forEach(item => {
+          areasData.push({
+            id: item.id,
+            name: item.name,
+            organization_id: item.organization_id,
+            organization_name: selectedOrganization,
+            responsibilities: item.responsibilities || [],
+            created_at: item.created_at,
+            updated_at: item.updated_at
           });
-        }
+        });
         
         setAreas(areasData);
       } catch (error) {
