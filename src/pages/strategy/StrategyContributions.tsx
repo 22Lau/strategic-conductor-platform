@@ -10,14 +10,15 @@ import { ArrowLeft, Users, Target, PlusCircle } from "lucide-react";
 import OrganizationsTab from "@/components/strategy/contributions/OrganizationsTab";
 import StrategicAreasTab from "@/components/strategy/contributions/StrategicAreasTab";
 import ContributionsTab from "@/components/strategy/contributions/ContributionsTab";
+import { Organization, StrategicArea } from "@/types/strategy";
 
 const StrategyContributions = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [organizations, setOrganizations] = useState<any[]>([]);
-  const [areas, setAreas] = useState<any[]>([]);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [areas, setAreas] = useState<StrategicArea[]>([]);
   const [activeTab, setActiveTab] = useState("contributions");
   const [selectedOrganization, setSelectedOrganization] = useState("");
   const [selectedArea, setSelectedArea] = useState("");
