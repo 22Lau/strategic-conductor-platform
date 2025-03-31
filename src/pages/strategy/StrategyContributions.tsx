@@ -22,17 +22,6 @@ interface UserOrganizationResponse {
   };
 }
 
-// Define a more specific type for strategic area database response
-interface StrategicAreaResponse {
-  id: string;
-  name: string;
-  organization_id: string | null;
-  organization_name?: string; // Make it optional
-  responsibilities: string[];
-  created_at: string | null;
-  updated_at: string | null;
-}
-
 const StrategyContributions = () => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -96,32 +85,32 @@ const StrategyContributions = () => {
       try {
         setLoading(true);
         // Fetch areas by organization name
-        const { data: rawData, error } = await supabase
+        const { data, error } = await supabase
           .from('strategic_areas')
           .select('*')
           .eq('organization_name', selectedOrganization);
           
         if (error) throw error;
         
-        // Using a simplified approach to avoid deep type inference
-        // Cast to a simpler type without triggering excessive type instantiation
-        const data = rawData as unknown as StrategicAreaResponse[];
-        
-        // Convert to the expected StrategicArea type
+        // Initialize an empty array for type safety
         const areasData: StrategicArea[] = [];
         
+        // Only process if data exists and is an array
         if (data && Array.isArray(data)) {
+          // Process each item individually without complex type inference
           data.forEach(item => {
-            areasData.push({
-              id: item.id,
-              name: item.name,
-              organization_id: item.organization_id || undefined,
-              // Use the organization_name if available or fallback to selectedOrganization
-              organization_name: (item.organization_name || selectedOrganization), 
-              responsibilities: item.responsibilities || [],
-              created_at: item.created_at || undefined,
-              updated_at: item.updated_at || undefined
-            });
+            // Use type assertion for each property individually
+            const area: StrategicArea = {
+              id: item.id as string,
+              name: item.name as string,
+              organization_id: (item.organization_id as string) || undefined,
+              // Use the organization name from data or fallback to selected organization
+              organization_name: selectedOrganization,
+              responsibilities: (item.responsibilities as string[]) || [],
+              created_at: (item.created_at as string) || undefined,
+              updated_at: (item.updated_at as string) || undefined
+            };
+            areasData.push(area);
           });
         }
         
