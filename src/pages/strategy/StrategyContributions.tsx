@@ -22,6 +22,17 @@ interface UserOrganizationResponse {
   };
 }
 
+// Simple type for strategic area response
+interface StrategicAreaResponse {
+  id: string;
+  name: string;
+  organization_id?: string;
+  organization_name?: string;
+  responsibilities?: string[];
+  created_at?: string;
+  updated_at?: string;
+}
+
 const StrategyContributions = () => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -92,7 +103,9 @@ const StrategyContributions = () => {
           
         if (error) throw error;
         
-        setAreas(data as StrategicArea[] || []);
+        // Use a type assertion with a more explicit type
+        const areasData = data as StrategicAreaResponse[] || [];
+        setAreas(areasData);
       } catch (error) {
         console.error('Error fetching areas:', error);
         toast({
