@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -92,22 +91,21 @@ const StrategyContributions = () => {
           
         if (error) throw error;
         
-        // Use type assertion to avoid deep type inference
+        // Simplified approach - avoid complex type inference
         const areasData: StrategicArea[] = [];
         
-        // Manually map each item to avoid complex type inference
-        if (data) {
-          for (const item of data) {
+        if (data && Array.isArray(data)) {
+          data.forEach(item => {
             areasData.push({
               id: item.id,
               name: item.name,
               organization_id: item.organization_id,
-              organization_name: item.organization_name,
-              responsibilities: item.responsibilities,
+              organization_name: item.organization_name || selectedOrganization, // Fallback to selectedOrganization
+              responsibilities: item.responsibilities || [],
               created_at: item.created_at,
               updated_at: item.updated_at
             });
-          }
+          });
         }
         
         setAreas(areasData);
