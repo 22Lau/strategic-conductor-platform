@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -96,18 +95,18 @@ const StrategyContributions = () => {
       try {
         setLoading(true);
         // Fetch areas by organization name
-        const { data: rawData, error } = await supabase
+        const { data, error } = await supabase
           .from('strategic_areas')
           .select('*')
           .eq('organization_name', selectedOrganization);
           
         if (error) throw error;
         
-        // Explicitly type the response to avoid deep type instantiation issues
-        const data = rawData as StrategicAreaResponse[] || [];
+        // Use type assertion but avoid deep nesting
+        const rawAreas = (data || []) as any[];
         
-        // Convert to StrategicArea[] type to match state
-        const areasData: StrategicArea[] = data.map(area => ({
+        // Map to the expected type structure
+        const areasData: StrategicArea[] = rawAreas.map(area => ({
           id: area.id,
           name: area.name,
           organization_id: area.organization_id,
