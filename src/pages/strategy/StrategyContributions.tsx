@@ -96,15 +96,27 @@ const StrategyContributions = () => {
       try {
         setLoading(true);
         // Fetch areas by organization name
-        const { data, error } = await supabase
+        const { data: rawData, error } = await supabase
           .from('strategic_areas')
           .select('*')
           .eq('organization_name', selectedOrganization);
           
         if (error) throw error;
         
-        // Use a type assertion with a more explicit type
-        const areasData = data as StrategicAreaResponse[] || [];
+        // Explicitly type the response to avoid deep type instantiation issues
+        const data = rawData as StrategicAreaResponse[] || [];
+        
+        // Convert to StrategicArea[] type to match state
+        const areasData: StrategicArea[] = data.map(area => ({
+          id: area.id,
+          name: area.name,
+          organization_id: area.organization_id,
+          organization_name: area.organization_name,
+          responsibilities: area.responsibilities,
+          created_at: area.created_at,
+          updated_at: area.updated_at
+        }));
+        
         setAreas(areasData);
       } catch (error) {
         console.error('Error fetching areas:', error);
