@@ -22,6 +22,16 @@ interface UserOrganizationResponse {
   };
 }
 
+// Define database response type for strategic areas
+interface StrategicAreaRow {
+  id: string;
+  name: string;
+  organization_id?: string;
+  responsibilities?: string[];
+  created_at?: string;
+  updated_at?: string;
+}
+
 const StrategyContributions = () => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -92,23 +102,24 @@ const StrategyContributions = () => {
           
         if (error) throw error;
         
-        // Initialize an empty array for type safety
+        // Transform the raw data into our StrategicArea type, avoiding complex type inference
         const areasData: StrategicArea[] = [];
         
-        // Only process if data exists and is an array
-        if (data && Array.isArray(data)) {
-          // Process each item individually without complex type inference
-          data.forEach(item => {
-            // Use type assertion for each property individually
+        if (data) {
+          // Cast data as any to bypass TypeScript's complex type inference
+          const rawData = data as any[];
+          
+          rawData.forEach(item => {
+            // Create a new StrategicArea object with explicit properties
             const area: StrategicArea = {
-              id: item.id as string,
-              name: item.name as string,
-              organization_id: (item.organization_id as string) || undefined,
-              // Use the organization name from data or fallback to selected organization
+              id: item.id,
+              name: item.name,
+              organization_id: item.organization_id,
+              // Add organization_name from selected organization
               organization_name: selectedOrganization,
-              responsibilities: (item.responsibilities as string[]) || [],
-              created_at: (item.created_at as string) || undefined,
-              updated_at: (item.updated_at as string) || undefined
+              responsibilities: Array.isArray(item.responsibilities) ? item.responsibilities : [],
+              created_at: item.created_at,
+              updated_at: item.updated_at
             };
             areasData.push(area);
           });
