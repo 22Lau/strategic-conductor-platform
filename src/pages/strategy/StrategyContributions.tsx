@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -19,17 +20,6 @@ interface UserOrganizationResponse {
     id: string;
     name: string;
   };
-}
-
-// Simple type for strategic area response
-interface StrategicAreaResponse {
-  id: string;
-  name: string;
-  organization_id?: string;
-  organization_name?: string;
-  responsibilities?: string[];
-  created_at?: string;
-  updated_at?: string;
 }
 
 const StrategyContributions = () => {
@@ -102,11 +92,11 @@ const StrategyContributions = () => {
           
         if (error) throw error;
         
-        // Use type assertion but avoid deep nesting
-        const rawAreas = (data || []) as any[];
+        // Avoid deep type instantiation by using a simple array type
+        const areasArray: any[] = data || [];
         
-        // Map to the expected type structure
-        const areasData: StrategicArea[] = rawAreas.map(area => ({
+        // Map to our expected type
+        const areasData: StrategicArea[] = areasArray.map(area => ({
           id: area.id,
           name: area.name,
           organization_id: area.organization_id,
