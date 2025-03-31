@@ -12,6 +12,16 @@ import StrategicAreasTab from "@/components/strategy/contributions/StrategicArea
 import ContributionsTab from "@/components/strategy/contributions/ContributionsTab";
 import { Organization, StrategicArea } from "@/types/strategy";
 
+// Type for database responses
+interface UserOrganizationResponse {
+  organization_id: string;
+  role: string;
+  organizations: {
+    id: string;
+    name: string;
+  };
+}
+
 const StrategyContributions = () => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -42,11 +52,12 @@ const StrategyContributions = () => {
           
         if (error) throw error;
         
-        const orgs = data?.map(item => ({
+        // Explicitly type and transform the response data
+        const orgs: Organization[] = (data as UserOrganizationResponse[] || []).map(item => ({
           id: item.organizations.id,
           name: item.organizations.name,
           role: item.role
-        })) || [];
+        }));
         
         setOrganizations(orgs);
       } catch (error) {
@@ -81,7 +92,7 @@ const StrategyContributions = () => {
           
         if (error) throw error;
         
-        setAreas(data || []);
+        setAreas(data as StrategicArea[] || []);
       } catch (error) {
         console.error('Error fetching areas:', error);
         toast({
