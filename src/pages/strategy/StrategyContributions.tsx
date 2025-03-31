@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,17 @@ interface UserOrganizationResponse {
     id: string;
     name: string;
   };
+}
+
+// Define a more specific type for strategic area database response
+interface StrategicAreaResponse {
+  id: string;
+  name: string;
+  organization_id: string | null;
+  organization_name?: string; // Make it optional
+  responsibilities: string[];
+  created_at: string | null;
+  updated_at: string | null;
 }
 
 const StrategyContributions = () => {
@@ -84,14 +96,18 @@ const StrategyContributions = () => {
       try {
         setLoading(true);
         // Fetch areas by organization name
-        const { data, error } = await supabase
+        const { data: rawData, error } = await supabase
           .from('strategic_areas')
           .select('*')
           .eq('organization_name', selectedOrganization);
           
         if (error) throw error;
         
-        // Simplified approach - avoid complex type inference
+        // Using a simplified approach to avoid deep type inference
+        // Cast to a simpler type without triggering excessive type instantiation
+        const data = rawData as unknown as StrategicAreaResponse[];
+        
+        // Convert to the expected StrategicArea type
         const areasData: StrategicArea[] = [];
         
         if (data && Array.isArray(data)) {
@@ -99,11 +115,12 @@ const StrategyContributions = () => {
             areasData.push({
               id: item.id,
               name: item.name,
-              organization_id: item.organization_id,
-              organization_name: item.organization_name || selectedOrganization, // Fallback to selectedOrganization
+              organization_id: item.organization_id || undefined,
+              // Use the organization_name if available or fallback to selectedOrganization
+              organization_name: (item.organization_name || selectedOrganization), 
               responsibilities: item.responsibilities || [],
-              created_at: item.created_at,
-              updated_at: item.updated_at
+              created_at: item.created_at || undefined,
+              updated_at: item.updated_at || undefined
             });
           });
         }
