@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -133,12 +132,22 @@ const StrategyContributions = () => {
         .filter((line: string) => line.trim() !== '')
         .map((line: string) => line.trim());
       
-      // Instead of using IDs from selects, we'll save the text values
+      // Find the selected area to get its ID
+      let areaId = values.areaId;
+      
+      // If no area ID but we have an area name, try to find a matching area
+      if (!areaId && values.area) {
+        const matchingArea = areas.find(a => a.name === values.area);
+        if (matchingArea) {
+          areaId = matchingArea.id;
+        }
+      }
+      
+      // Submit with the area_id instead of area_name
       const { data, error } = await supabase
         .from('strategic_contributions')
         .insert({
-          organization_name: values.organization, // Save organization name instead of ID
-          area_name: values.area, // Save area name instead of ID
+          area_id: areaId,
           strategic_line: values.strategicLine,
           contribution: values.contribution,
           examples: examplesArray
