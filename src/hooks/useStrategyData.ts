@@ -51,11 +51,19 @@ export const useStrategyData = (userId?: string) => {
           
         if (error) throw error;
         
-        const orgs: Organization[] = (data as UserOrganizationResponse[] || []).map(item => ({
-          id: item.organizations.id,
-          name: item.organizations.name,
-          role: item.role
-        }));
+        // Safer type assertion with explicit mapping
+        const orgs: Organization[] = [];
+        if (data) {
+          for (const item of data) {
+            if (item && item.organizations) {
+              orgs.push({
+                id: item.organizations.id,
+                name: item.organizations.name,
+                role: item.role
+              });
+            }
+          }
+        }
         
         setOrganizations(orgs);
       } catch (error) {
@@ -89,24 +97,22 @@ export const useStrategyData = (userId?: string) => {
           
         if (error) throw error;
         
-        if (!data) {
-          setAreas([]);
-          return;
+        // Safer handling of data
+        const areasData: StrategicArea[] = [];
+        
+        if (data) {
+          data.forEach(item => {
+            areasData.push({
+              id: item.id,
+              name: item.name,
+              organization_id: item.organization_id,
+              organization_name: selectedOrganization,
+              responsibilities: item.responsibilities || [],
+              created_at: item.created_at,
+              updated_at: item.updated_at
+            });
+          });
         }
-        
-        // Convert to array and cast to StrategicAreaRow
-        const areaRows = data as any[];
-        
-        // Map to StrategicArea objects
-        const areasData: StrategicArea[] = areaRows.map(item => ({
-          id: item.id,
-          name: item.name,
-          organization_id: item.organization_id,
-          organization_name: selectedOrganization,
-          responsibilities: item.responsibilities || [],
-          created_at: item.created_at,
-          updated_at: item.updated_at
-        }));
         
         setAreas(areasData);
       } catch (error) {
